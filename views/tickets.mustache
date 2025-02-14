@@ -1,0 +1,12 @@
+<h2>Ingressos Disponíveis</h2>
+<ul>
+  {{#tickets}}
+  <li>
+    Nome: {{name}} - Preço: {{price}} - Quantidade: {{quantity}}
+    {{#isAdmin}}
+      <a href="/tickets/edit/{{id}}">Editar</a>
+      <a href="/tickets/delete/{{id}}">Excluir</a>
+    {{/isAdmin}}
+  </li>
+  {{/tickets}}
+</ul>
