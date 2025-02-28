@@ -1,35 +1,22 @@
 const express = require('express');
-const mustacheExpress = require('mustache-express');
-const { authenticateToken, isAdmin, login } = require('./middleware/auth'); // Importando a função de login
-const { User, Ticket, Purchase } = require('./models');
-const sequelize = require('./models/index');
+const path = require('path'); // Importar o módulo path
+const uploadRouter = require('./Multiplefiles/upload'); 
+const purchaseRouter = require('./routers/purchase'); // Importando o router de compras
 
 const app = express();
-app.engine('mustache', mustacheExpress());
-app.set('view engine', 'mustache');
-app.set('views', './views');
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public'))); // Servir arquivos estáticos da pasta 'public'
 
-// Rota para a página inicial
+// Rota para servir a página principal
 app.get('/', (req, res) => {
-    res.send('Bem-vindo ao sistema de venda de ingressos!');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Rota de Login
-app.post('/login', login); // Definindo a rota de login
+app.use('/api', uploadRouter); // Integrando a rota de upload
+app.use('/api', purchaseRouter); // Integrando a rota de compras
 
-// Rota de Cadastro
-app.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-    const hash = bcrypt.hashSync(password, 10);
-    await User.create({ username, password: hash });
-    res.send('Usuário registrado!');
-});
-
-// Outras rotas...
-
-// Inicialização
-sequelize.sync().then(() => {
-    app.listen(3000, () => console.log('Servidor rodando na porta 3000 🚀'));
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
